@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gate Staff Scanner - EventSphere</title>
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- HTML5-QRCode Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="badge bg-warning text-dark"><i class="bi bi-qr-code-scan"></i> GATE SCANNER</span>
+                <span class="fs-6 d-none d-sm-inline">EventSphere Admissions</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-outline-light btn-sm"><i class="bi bi-house-door me-1"></i>Portal</a>
+                <div id="auth-header-actions"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Quick Staff Demo Login Switcher -->
+    <div class="bg-white border-bottom py-2 shadow-sm">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span class="small text-muted"><i class="bi bi-shield-lock me-1"></i><strong>Gate Admissions Mode</strong> (Staff or Admin required)</span>
+            <button class="btn btn-sm btn-outline-primary py-0" onclick="AuthState.quickLogin('staff@eventsphere.ac.uk', 'Staff@123')">
+                <i class="bi bi-key me-1"></i>Log In as Demo Staff (<code>staff@eventsphere.ac.uk</code>)
+            </button>
+        </div>
+    </div>
+
+    <main class="container my-3" style="max-width: 680px;">
+        <!-- Gate Event Selector -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body py-2">
+                <label class="form-label small fw-bold text-muted mb-1">Gate Event Verification Filter:</label>
+                <select class="form-select form-select-sm" id="gate-event-select">
+                    <option value="">All Events (Accept any valid ticket)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Camera Scanner Card -->
+        <div class="card border shadow-sm mb-3">
+            <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark"><i class="bi bi-camera me-1 text-primary"></i>Live Camera QR Scanner</span>
+                <div>
+                    <button class="btn btn-sm btn-primary" id="btn-start-camera" onclick="startCameraScanner()">
+                        <i class="bi bi-camera-video me-1"></i>Start Camera
+                    </button>
+                    <button class="btn btn-sm btn-danger d-none" id="btn-stop-camera" onclick="stopCameraScanner()">
+                        <i class="bi bi-stop-circle me-1"></i>Stop Camera
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-2 text-center">
+                <div id="reader"></div>
+                <small class="text-muted d-block mt-2">Point phone camera directly at the attendee's QR code.</small>
+            </div>
+        </div>
+
+        <!-- Manual Code Entry Fallback (Requirement 5b) -->
+        <div class="card border shadow-sm mb-3">
+            <div class="card-header bg-white py-2">
+                <span class="fw-bold text-dark"><i class="bi bi-keyboard me-1 text-secondary"></i>Manual Code Entry Fallback</span>
+            </div>
+            <div class="card-body">
+                <form id="manual-scan-form" class="d-flex gap-2">
+                    <input type="text" class="form-control font-monospace text-uppercase" id="manual-code-input" placeholder="e.g. TICK-A1B2C3D4E5F6" required>
+                    <button type="submit" class="btn btn-dark fw-bold px-4 text-nowrap">
+                        Verify Ticket
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Real-Time Visual Feedback Banner -->
+        <div id="scan-feedback-container" class="mb-3">
+            <div class="alert alert-secondary text-center py-4 text-muted mb-0">
+                <i class="bi bi-upc-scan fs-1 d-block mb-1"></i>
+                Ready to scan incoming attendee tickets.
+            </div>
+        </div>
+
+        <!-- Recent Scans History & Suspicious Scan Log -->
+        <div class="card border shadow-sm">
+            <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark small"><i class="bi bi-clock-history me-1 text-info"></i>Gate Scan Stream & Repeated Scan Alerts</span>
+                <button class="btn btn-link btn-sm text-decoration-none p-0" onclick="loadScanLogs()">Refresh</button>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Code</th>
+                            <th>Result</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scan-logs-tbody">
+                        <tr><td colspan="4" class="text-center text-muted py-3">Loading scans...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/staff.js"></script>
+</body>
+</html>

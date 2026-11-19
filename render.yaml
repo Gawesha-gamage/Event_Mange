@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: eventsphere
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python seed_data.py && uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PROJECT_NAME
+        value: EventSphere
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///./eventsphere.db
+      - key: CART_HOLD_DURATION_SECONDS
+        value: "300"
+      - key: WAITLIST_HOLD_DURATION_SECONDS
+        value: "300"
+      - key: WAITLIST_SWEEP_INTERVAL_SECONDS
+        value: "10"
+      - key: VENUE_TURNAROUND_BUFFER_MINUTES
+        value: "60"
+      - key: PYTHON_VERSION
+        value: 3.12.0

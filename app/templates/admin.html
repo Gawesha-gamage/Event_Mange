@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Organiser Dashboard & Agent Monitor - EventSphere</title>
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Visual Analytics (Part C) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/admin">
+                <span class="badge bg-danger"><i class="bi bi-shield-lock-fill"></i> ORGANISER ADMIN</span>
+                <span class="fs-6 fw-bold">EventSphere Control Hub</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="/" class="btn btn-outline-light btn-sm"><i class="bi bi-house-door me-1"></i>Portal</a>
+                <a href="/scanner" class="btn btn-outline-warning btn-sm"><i class="bi bi-qr-code-scan me-1"></i>Scanner</a>
+                <div id="auth-header-actions"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Subnav Tabs -->
+    <div class="bg-white border-bottom shadow-sm">
+        <div class="container-fluid px-lg-4">
+            <ul class="nav nav-pills py-2 gap-2" id="adminTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-overview">
+                        <i class="bi bi-speedometer2 me-1"></i>Analytics Overview
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-agent-logs">
+                        <i class="bi bi-cpu me-1"></i>Agent Message Bus Logs
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-events-manage">
+                        <i class="bi bi-calendar-event me-1"></i>Manage Events
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-venues-manage">
+                        <i class="bi bi-building me-1"></i>Manage Venues
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-escalated-hires">
+                        <i class="bi bi-exclamation-diamond me-1"></i>Private Hire Escalations
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-3 py-1 btn-sm" data-bs-toggle="tab" data-bs-target="#tab-agent-beliefs">
+                        <i class="bi bi-database-check me-1"></i>Agent Persistent Beliefs
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <main class="container-fluid px-lg-4 my-4">
+        <div class="tab-content" id="adminTabContent">
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 1: Analytics & KPI Dashboard                     -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+                
+                <!-- KPI Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Total Events</small>
+                            <h2 class="fw-bold text-primary mb-0 mt-1" id="kpi-events">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Total Venues</small>
+                            <h2 class="fw-bold text-dark mb-0 mt-1" id="kpi-venues">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Tickets Sold</small>
+                            <h2 class="fw-bold text-success mb-0 mt-1" id="kpi-tickets">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Simulated Revenue</small>
+                            <h2 class="fw-bold text-success mb-0 mt-1" id="kpi-revenue">£0.00</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Total Check-ins</small>
+                            <h2 class="fw-bold text-info mb-0 mt-1" id="kpi-checkins">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2">
+                        <div class="card border shadow-sm p-3 bg-white text-center">
+                            <small class="text-muted text-uppercase fw-bold">Hire Escalations</small>
+                            <h2 class="fw-bold text-warning mb-0 mt-1" id="kpi-escalations">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Charts (Part C) -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-lg-8">
+                        <div class="card border shadow-sm h-100">
+                            <div class="card-header bg-white py-3 fw-bold">
+                                <i class="bi bi-bar-chart-fill text-primary me-2"></i>Sales, Check-ins & Capacity per Event
+                            </div>
+                            <div class="card-body" style="height: 320px;">
+                                <canvas id="chart-events"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="card border shadow-sm h-100">
+                            <div class="card-header bg-white py-3 fw-bold">
+                                <i class="bi bi-pie-chart-fill text-success me-2"></i>Ticket Status Distribution
+                            </div>
+                            <div class="card-body" style="height: 320px;">
+                                <canvas id="chart-ticket-status"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Capacity & Sales Performance Table -->
+                <div class="card border shadow-sm">
+                    <div class="card-header bg-white py-3 fw-bold">
+                        <i class="bi bi-table text-secondary me-2"></i>Event Capacity, Sales & Check-in Performance
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Event Title</th>
+                                    <th>Venue</th>
+                                    <th>Sales / Capacity</th>
+                                    <th>Turnout Rate</th>
+                                    <th>Simulated Revenue</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-events-perf-tbody">
+                                <tr><td colspan="6" class="text-center py-3 text-muted">Loading metrics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 2: Multi-Agent Message Bus Logs (Part B & C)     -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-agent-logs" role="tabpanel">
+                <div class="card border shadow-sm mb-3">
+                    <div class="card-body py-2">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12 col-md-5">
+                                <input type="text" class="form-control form-control-sm font-monospace" id="filter-log-conv" placeholder="Filter by Conversation ID (e.g. conv-...)">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <select class="form-select form-select-sm" id="filter-log-perf">
+                                    <option value="">All Performatives</option>
+                                    <option value="REQUEST">REQUEST</option>
+                                    <option value="AGREE">AGREE</option>
+                                    <option value="REFUSE">REFUSE</option>
+                                    <option value="PROPOSE">PROPOSE</option>
+                                    <option value="INFORM">INFORM</option>
+                                    <option value="FAILURE">FAILURE</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-4 text-end">
+                                <button class="btn btn-outline-primary btn-sm px-3" onclick="loadAgentLogs()">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Refresh Stream
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border shadow-sm">
+                    <div class="card-header bg-white py-2 fw-bold d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-terminal-fill me-2 text-dark"></i>Structured Agent Message Stream (FIPA Performatives)</span>
+                        <small class="text-muted">Trace any user action across cooperating agents</small>
+                    </div>
+                    <div class="card-body p-3 bg-light" id="agent-logs-container" style="max-height: 600px; overflow-y: auto;">
+                        <!-- Agent logs stream -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 3: Event Management                              -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-events-manage" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">University Events</h5>
+                    <button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                        <i class="bi bi-plus-lg me-1"></i>Create New Event
+                    </button>
+                </div>
+                <div class="card border shadow-sm">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Venue</th>
+                                    <th>Start Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-events-list-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 4: Venue Management                              -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-venues-manage" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Campus Venues</h5>
+                    <button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#createVenueModal">
+                        <i class="bi bi-plus-lg me-1"></i>Add Campus Venue
+                    </button>
+                </div>
+                <div class="card border shadow-sm">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Capacity</th>
+                                    <th>Hourly Rate</th>
+                                    <th>Private Hire</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-venues-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 5: Private Hire Escalations                      -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-escalated-hires" role="tabpanel">
+                <h5 class="fw-bold mb-3">Escalated Private Hire Applications</h5>
+                <div class="card border shadow-sm">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Venue</th>
+                                    <th>Applicant</th>
+                                    <th>Purpose</th>
+                                    <th>Guests</th>
+                                    <th>Calculated Price</th>
+                                    <th>Escalation Reason</th>
+                                    <th>Sign-Off</th>
+                                </tr>
+                            </thead>
+                            <tbody id="escalated-hires-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 6: Agent Persistent Beliefs (Survives Restarts)   -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-agent-beliefs" role="tabpanel">
+                <div class="card border shadow-sm">
+                    <div class="card-header bg-white py-3 fw-bold d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-database me-2 text-primary"></i>Agent Persistent Beliefs (Survives Server Restarts)</span>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadAgentBeliefs()">Refresh</button>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th>Belief Key</th>
+                                    <th>Stored Value</th>
+                                    <th>Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agent-beliefs-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal: Create Venue -->
+    <div class="modal fade" id="createVenueModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">Register Campus Venue</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form onsubmit="createNewVenue(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Venue Name</label>
+                            <input type="text" class="form-control" id="venue-name" required placeholder="e.g. Great Hall">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Location</label>
+                            <input type="text" class="form-control" id="venue-location" required placeholder="Building 4, Central Campus">
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Capacity</label>
+                                <input type="number" class="form-control" id="venue-capacity" required min="10" value="250">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Hourly Rate (£)</label>
+                                <input type="number" class="form-control" id="venue-rate" required min="10" value="120">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Description</label>
+                            <textarea class="form-control" id="venue-desc" rows="2" placeholder="Venue facilities and acoustic notes"></textarea>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="venue-open-hire" checked>
+                            <label class="form-check-label small fw-semibold" for="venue-open-hire">Open for Private Hire by Students & Public</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Save Venue</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Create Event -->
+    <div class="modal fade" id="createEventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">Schedule Event (Consults VenueAgent)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form onsubmit="createNewEvent(event)">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-8">
+                                <label class="form-label small fw-semibold">Event Title</label>
+                                <input type="text" class="form-control" id="event-title" required placeholder="AI in Medicine Annual Conference">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-semibold">Category</label>
+                                <select class="form-select" id="event-category">
+                                    <option value="Concert">Concert</option>
+                                    <option value="Workshop">Workshop</option>
+                                    <option value="Seminar">Seminar</option>
+                                    <option value="Conference">Conference</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-semibold">Venue</label>
+                                <select class="form-select" id="event-venue-select" required></select>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-label small fw-semibold">Start Time</label>
+                                <input type="datetime-local" class="form-control" id="event-start" required>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-label small fw-semibold">End Time</label>
+                                <input type="datetime-local" class="form-control" id="event-end" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Description</label>
+                            <textarea class="form-control" id="event-desc" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Banner Image URL (Optional)</label>
+                            <input type="url" class="form-control" id="event-image" placeholder="https://images.unsplash.com/...">
+                        </div>
+
+                        <!-- Ticket Categories -->
+                        <div class="mb-3 border-top pt-3">
+                            <label class="form-label small fw-bold">Ticket Categories & Pricing</label>
+                            <div id="ticket-categories-wrapper">
+                                <div class="row g-2 mb-2 ticket-category-row">
+                                    <div class="col-5">
+                                        <input type="text" class="form-control form-control-sm cat-name" value="Standard" placeholder="Category Name" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="number" class="form-control form-control-sm cat-price" value="15.00" placeholder="Price (£)" step="0.5" required>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" class="form-control form-control-sm cat-qty" value="50" placeholder="Quantity" required>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2 ticket-category-row">
+                                    <div class="col-5">
+                                        <input type="text" class="form-control form-control-sm cat-name" value="Student VIP" placeholder="Category Name">
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="number" class="form-control form-control-sm cat-price" value="25.00" placeholder="Price (£)" step="0.5">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" class="form-control form-control-sm cat-qty" value="20" placeholder="Quantity">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">
+                            Validate with VenueAgent & Schedule
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/admin.js"></script>
+    <script>
+    // Populate event venue select in modal
+    document.getElementById("createEventModal").addEventListener("show.bs.modal", async () => {
+        const venues = await apiRequest("/api/venues");
+        const select = document.getElementById("event-venue-select");
+        select.innerHTML = venues.map(v => `<option value="${v.id}">${v.name} (Cap: ${v.capacity})</option>`).join("");
+    });
+    </script>
+</body>
+</html>

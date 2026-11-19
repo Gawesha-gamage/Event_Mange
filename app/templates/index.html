@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EventSphere - Multi-Agent Venue Booking & Digital Ticketing Platform</title>
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <div class="brand-badge">
+                    <i class="bi bi-intersect"></i>
+                    <span>EventSphere</span>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-pills ms-lg-3 gap-1" id="mainTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill px-3 py-2" id="events-tab" data-bs-toggle="tab" data-bs-target="#tab-events" type="button" role="tab">
+                            <i class="bi bi-calendar3 me-1"></i>Explore Events
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-2" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button" role="tab" onclick="loadMyTickets()">
+                            <i class="bi bi-qr-code me-1"></i>My Digital Tickets
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-2" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#tab-bookings" type="button" role="tab" onclick="loadMyBookings()">
+                            <i class="bi bi-receipt me-1"></i>My Bookings
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-2" id="hire-tab" data-bs-toggle="tab" data-bs-target="#tab-hire" type="button" role="tab" onclick="loadMyHireRequests()">
+                            <i class="bi bi-building me-1"></i>Private Venue Hire
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-2" id="waitlist-tab" data-bs-toggle="tab" data-bs-target="#tab-waitlist" type="button" role="tab" onclick="loadMyWaitlist()">
+                            <i class="bi bi-hourglass-split me-1"></i>Waitlist & Holds
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0" id="auth-header-actions">
+                    <!-- Dynamic auth state rendered by app.js -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Viva Evaluation Quick Role Switcher Banner -->
+    <div class="bg-light border-bottom py-1 small">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span class="text-muted"><i class="bi bi-mortarboard-fill text-primary me-1"></i><strong>IT4123 ICA 02 Viva Demo Switcher:</strong></span>
+            <div class="d-flex gap-1 flex-wrap">
+                <button class="btn btn-xs btn-outline-dark py-0 px-2" style="font-size: 0.75rem;" onclick="AuthState.quickLogin('attendee@eventsphere.ac.uk', 'Attendee@123')">
+                    <i class="bi bi-person me-1"></i>Attendee Demo
+                </button>
+                <button class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.75rem;" onclick="AuthState.quickLogin('staff@eventsphere.ac.uk', 'Staff@123')">
+                    <i class="bi bi-qr-code-scan me-1"></i>Gate Staff Demo
+                </button>
+                <button class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size: 0.75rem;" onclick="AuthState.quickLogin('admin@eventsphere.ac.uk', 'Admin@123')">
+                    <i class="bi bi-shield-lock me-1"></i>Admin Organiser Demo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="container my-4">
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 1: Events Explorer & Advanced Search             -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade show active" id="tab-events" role="tabpanel">
+                
+                <!-- Hero Section -->
+                <div class="p-4 p-md-5 mb-4 rounded-3 text-white hero-banner" style="background: linear-gradient(135deg, #312e81, #4f46e5, #0ea5e9);">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <span class="badge bg-white text-primary fw-bold mb-2">University Multi-Agent Platform</span>
+                            <h1 class="display-6 fw-bold mb-2">Book Campus Events & Venues with Cooperating Agents</h1>
+                            <p class="lead mb-3 text-light opacity-90 fs-6">
+                                Concerts, seminars, workshops, and private space hire. All bookings and calendar clash checks are decided autonomously by software agents.
+                            </p>
+                            <!-- Search Bar -->
+                            <div class="input-group shadow-sm bg-white rounded-pill p-1">
+                                <span class="input-group-text bg-transparent border-0 ps-3">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 shadow-none" id="search-input" placeholder="Search events by title, keyword, or speaker...">
+                                <button class="btn btn-primary rounded-pill px-4" type="button" onclick="loadEvents({ search: document.getElementById('search-input').value.trim() })">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Pills & Filter Toggle -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="d-flex flex-wrap gap-2" id="category-pills-container">
+                        <button class="category-pill active" data-category="All">All Events</button>
+                        <button class="category-pill" data-category="Concert">Concerts</button>
+                        <button class="category-pill" data-category="Workshop">Workshops</button>
+                        <button class="category-pill" data-category="Seminar">Seminars</button>
+                        <button class="category-pill" data-category="Conference">Conferences</button>
+                    </div>
+
+                    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSearchCollapse">
+                        <i class="bi bi-sliders me-1"></i>Advanced Filters (Part C)
+                    </button>
+                </div>
+
+                <!-- Advanced Filters Accordion (Part C) -->
+                <div class="collapse mb-4" id="advancedSearchCollapse">
+                    <div class="card card-body shadow-sm bg-white border">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label small fw-semibold">Venue</label>
+                                <select class="form-select form-select-sm" id="filter-venue">
+                                    <option value="">All Venues</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="form-label small fw-semibold">Min Price (£)</label>
+                                <input type="number" class="form-control form-control-sm" id="filter-min-price" placeholder="0">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="form-label small fw-semibold">Max Price (£)</label>
+                                <input type="number" class="form-control form-control-sm" id="filter-max-price" placeholder="100">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <label class="form-label small fw-semibold">Start Date</label>
+                                <input type="date" class="form-control form-control-sm" id="filter-start-date">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button class="btn btn-primary btn-sm px-4" id="apply-advanced-filters">
+                                    <i class="bi bi-funnel me-1"></i>Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Grid -->
+                <div class="row g-3" id="events-grid">
+                    <!-- Events populated dynamically by attendee.js -->
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 2: Digital Tickets with QR Codes (Part A & C)     -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-tickets" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-qr-code me-2 text-primary"></i>My Digital Tickets</h3>
+                        <p class="text-muted small mb-0">Show this unique QR code at the entrance for one-time admission.</p>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="loadMyTickets()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+                <div class="row g-3" id="my-tickets-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 3: Booking History & Cancellation Policy         -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-bookings" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-receipt me-2 text-primary"></i>Booking History</h3>
+                        <p class="text-muted small mb-0">Manage past bookings and review stated refund policies.</p>
+                    </div>
+                </div>
+
+                <!-- Stated University Refund Policy Notice -->
+                <div class="alert alert-info py-2 small mb-3">
+                    <strong><i class="bi bi-info-circle me-1"></i>Stated University Cancellation Refund Policy:</strong>
+                    Cancellations &ge; 48h prior to event receive <strong>100% full refund</strong>; between 24h and 48h receive <strong>50% refund</strong>; under 24h receive <strong>0% refund</strong>. If an event is cancelled by the university, a 100% full refund is automatically issued.
+                </div>
+
+                <div id="my-bookings-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 4: Private Venue Hire (Part A & C)               -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-hire" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-6">
+                        <div class="card border shadow-sm h-100">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="fw-bold mb-0 text-dark">
+                                    <i class="bi bi-building-add me-2 text-primary"></i>Request Private Venue Hire
+                                </h5>
+                                <small class="text-muted">Hire university spaces for farewells, receptions, or society meetings.</small>
+                            </div>
+                            <div class="card-body">
+                                <form id="venue-hire-form" onsubmit="submitVenueHireRequest(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Select Venue</label>
+                                        <select class="form-select" id="hire-venue-select" required onchange="recalcHirePrice()">
+                                            <!-- Venues -->
+                                        </select>
+                                    </div>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">Start Date & Time</label>
+                                            <input type="datetime-local" class="form-control" id="hire-start-time" required onchange="recalcHirePrice()">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">End Date & Time</label>
+                                            <input type="datetime-local" class="form-control" id="hire-end-time" required onchange="recalcHirePrice()">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Event Purpose / Occasion</label>
+                                        <input type="text" class="form-control" id="hire-purpose" placeholder="e.g. Computing Society Annual Dinner" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Expected Guest Count</label>
+                                        <input type="number" class="form-control" id="hire-guest-count" value="50" min="1" required onchange="recalcHirePrice()">
+                                    </div>
+
+                                    <!-- Price Calculation Preview (VenueAgent Rule VA-4) -->
+                                    <div class="mb-3" id="hire-price-preview">
+                                        <!-- Dynamic breakdown -->
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold" id="btn-submit-hire">
+                                        Submit Hire Request
+                                    </button>
+                                </form>
+
+                                <!-- Decision Result / Counter Proposal Box -->
+                                <div class="mt-3 d-none" id="hire-decision-result"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="card border shadow-sm h-100">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="fw-bold mb-0 text-dark">
+                                    <i class="bi bi-clock-history me-2 text-primary"></i>My Past Hire Requests
+                                </h5>
+                                <small class="text-muted">Decisions made by VenueAgent</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="my-hire-requests-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------- -->
+            <!-- TAB 5: Waitlist & Seat Holds (Part C Advanced)       -->
+            <!-- ---------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-waitlist" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-hourglass-split me-2 text-warning"></i>Waitlist & Seat Holds</h3>
+                        <p class="text-muted small mb-0">Managed autonomously by WaitlistAgent with proactive timer expiry.</p>
+                    </div>
+                    <button class="btn btn-outline-warning btn-sm" onclick="loadMyWaitlist()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-8 mx-auto" id="my-waitlist-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL 1: Booking & 5-Minute Cart Hold (Part C)        -->
+    <!-- ---------------------------------------------------- -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="booking-modal-label">Book Tickets</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Step 1: Selection -->
+                    <div id="booking-step-1">
+                        <h5 class="fw-bold text-dark mb-1" id="booking-event-title">Event Title</h5>
+                        <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1 text-danger"></i><span id="booking-event-venue">Venue</span></p>
+                        <p class="small text-primary fw-semibold mb-3"><i class="bi bi-clock me-1"></i><span id="booking-event-time">Time</span></p>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Ticket Category</label>
+                            <select class="form-select" id="booking-category-select" onchange="updateBookingSummary()">
+                                <!-- Categories -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Quantity (Max 6)</label>
+                            <input type="number" class="form-control" id="booking-quantity-input" value="1" min="1" max="6" onchange="updateBookingSummary()">
+                            <small class="text-muted">Agent Rule BA-1: Maximum 6 tickets per booking for fair public distribution.</small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-3">
+                            <span class="fw-bold">Total Amount:</span>
+                            <span class="fs-4 fw-bold text-primary" id="booking-summary-total">£0.00</span>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 fw-bold py-2" onclick="proceedToSimulatedPayment()">
+                            Place 5-Minute Cart Hold & Proceed
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Simulated Payment with Visible Countdown -->
+                    <div id="booking-step-2" class="d-none">
+                        <div class="countdown-box mb-3">
+                            <div>
+                                <small class="text-muted d-block">Cart Hold Active</small>
+                                <span class="fw-bold text-dark">Seats reserved for you</span>
+                            </div>
+                            <div class="countdown-timer" id="cart-countdown-timer">05:00</div>
+                        </div>
+
+                        <div class="alert alert-secondary py-2 small mb-3">
+                            <i class="bi bi-shield-lock-fill text-success me-1"></i><strong>Simulated Payment:</strong> No real card or bank details are collected. A random payment reference will be recorded.
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Cardholder Name (Simulated)</label>
+                            <input type="text" class="form-control" id="cardholder-name" value="Jane Doe (Student)">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Simulated Card Number</label>
+                            <input type="text" class="form-control font-monospace" value="4532 •••• •••• 8841" readonly>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>Amount to Charge:</span>
+                            <span class="fw-bold fs-5 text-dark" id="simulated-pay-amount">£0.00</span>
+                        </div>
+                        <button type="button" class="btn btn-success w-100 fw-bold py-2" id="btn-confirm-payment" onclick="confirmSimulatedPayment()">
+                            Complete Simulated Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL 2: Join Waitlist                               -->
+    <!-- ---------------------------------------------------- -->
+    <div class="modal fade" id="waitlistModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-hourglass-split me-2"></i>Join Event Waitlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <h5 class="fw-bold text-dark mb-2" id="waitlist-event-title">Event</h5>
+                    <p class="small text-muted mb-3">When seats are freed from cancellations, WaitlistAgent offers them to waiting customers in FIFO order with a 5-minute hold.</p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Ticket Category</label>
+                        <select class="form-select" id="waitlist-category-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Requested Seats</label>
+                        <input type="number" class="form-control" id="waitlist-quantity" value="1" min="1" max="4">
+                    </div>
+                    <button type="button" class="btn btn-warning w-100 fw-bold" onclick="submitJoinWaitlist()">
+                        Confirm Waitlist Entry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL 3: Sign In & Demo Switcher                     -->
+    <!-- ---------------------------------------------------- -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">Sign In to EventSphere</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form onsubmit="event.preventDefault(); AuthState.quickLogin(document.getElementById('login-email').value, document.getElementById('login-password').value);">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Email address</label>
+                            <input type="email" class="form-control" id="login-email" required placeholder="user@eventsphere.ac.uk">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password</label>
+                            <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">Sign In</button>
+                    </form>
+
+                    <div class="border-top pt-3">
+                        <p class="small text-muted mb-2 text-center"><strong>One-Click Viva Demo Accounts:</strong></p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-dark btn-sm text-start" onclick="AuthState.quickLogin('attendee@eventsphere.ac.uk', 'Attendee@123')">
+                                <i class="bi bi-person me-2"></i>Attendee: <code>attendee@eventsphere.ac.uk</code>
+                            </button>
+                            <button class="btn btn-outline-info btn-sm text-start text-dark" onclick="AuthState.quickLogin('staff@eventsphere.ac.uk', 'Staff@123')">
+                                <i class="bi bi-qr-code me-2"></i>Gate Staff: <code>staff@eventsphere.ac.uk</code>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm text-start" onclick="AuthState.quickLogin('admin@eventsphere.ac.uk', 'Admin@123')">
+                                <i class="bi bi-shield-lock me-2"></i>Admin Organiser: <code>admin@eventsphere.ac.uk</code>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL 4: User Register                               -->
+    <!-- ---------------------------------------------------- -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">Create Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form onsubmit="handleRegistration(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Full Name</label>
+                            <input type="text" class="form-control" id="reg-name" required placeholder="Alice Smith">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Email</label>
+                            <input type="email" class="form-control" id="reg-email" required placeholder="alice@university.ac.uk">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password</label>
+                            <input type="password" class="form-control" id="reg-password" required minlength="6" placeholder="At least 6 characters">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Register Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL 5: Notifications & Email Logs                  -->
+    <!-- ---------------------------------------------------- -->
+    <div class="modal fade" id="notificationsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-white border-bottom">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-bell-fill text-primary me-2"></i>My Notifications & Emails</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush" id="notifications-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/static/js/app.js"></script>
+    <!-- Attendee Portal JS -->
+    <script src="/static/js/attendee.js"></script>
+
+    <script>
+    async function handleRegistration(e) {
+        e.preventDefault();
+        const payload = {
+            name: document.getElementById("reg-name").value.trim(),
+            email: document.getElementById("reg-email").value.trim(),
+            password: document.getElementById("reg-password").value,
+            role: "attendee"
+        };
+        try {
+            const data = await apiRequest("/api/auth/register", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            AuthState.setAuth(data.access_token, {
+                id: data.user_id,
+                name: data.name,
+                email: data.email,
+                role: data.role
+            });
+            showToast("Welcome to EventSphere! Account registered.", "success");
+            const modal = bootstrap.Modal.getInstance(document.getElementById("registerModal"));
+            if (modal) modal.hide();
+            setTimeout(() => window.location.reload(), 400);
+        } catch (err) {
+            showToast(err.message, "danger");
+        }
+    }
+    </script>
+</body>
+</html>
